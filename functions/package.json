@@ -1,7 +1,6 @@
 {
   "name": "shopify-changelog",
   "version": "1.0.0",
-  "type": "module",
   "author": "Erik Marty <erik@themazegroup.com>",
   "license": "NONE",
   "dependencies": {

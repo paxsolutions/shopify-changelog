@@ -1,6 +1,6 @@
-import axios from "axios";
-import * as cheerio from "cheerio";
-import RSS from "rss";
+const axios = require("axios");
+const cheerio = require("cheerio");
+const RSS = require("rss");
 
 exports.handler = async (event) => {
   try {
@@ -38,7 +38,8 @@ exports.handler = async (event) => {
     const feed = new RSS({
       title: "Custom RSS Feed",
       description: "A custom RSS feed generated from a website",
-      feed_url: "",
+      feed_url:
+        "https://fjq6hqfqe72ctpotuo6awkoi5a0oelmj.lambda-url.us-east-1.on.aws",
       site_url: url,
       language: "en",
     });
