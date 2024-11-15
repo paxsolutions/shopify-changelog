@@ -30,7 +30,7 @@ const formatPubDate = (date) => {
   return `${dayName}, ${day} ${monthName} ${year} ${hours}:${minutes}:${seconds} +0000`;
 };
 
-exports.handler = async (event) => {
+const scrapeAndGenerateRSS = async () => {
   try {
     const url = "https://changelog.shopify.com";
     const response = await axios.get(url);
@@ -74,7 +74,8 @@ exports.handler = async (event) => {
     const feed = new RSS({
       title: "Changelog",
       description: "What’s New at Shopify?",
-      feed_url: "",
+      feed_url:
+        "https://fjq6hqfqe72ctpotuo6awkoi5a0oelmj.lambda-url.us-east-1.on.aws",
       site_url: "https://changelog.shopify.com",
       language: "en-us",
       ttl: 40,
@@ -94,21 +95,13 @@ exports.handler = async (event) => {
     });
 
     const rssXML = feed.xml({ indent: true });
+    console.log(rssXML);
 
-    return {
-      statusCode: 200,
-      headers: { "Content-Type": "application/xml" },
-      body: rssXML,
-    };
+    return rssXML;
   } catch (error) {
     console.error("Error scraping website or generating RSS feed:", error);
-
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        message: "Failed to scrape the website or generate the RSS feed.",
-        error: error.message,
-      }),
-    };
+    throw error;
   }
 };
+
+scrapeAndGenerateRSS();
