@@ -1,0 +1,33 @@
+name: λ Update Shopify Changelog Lambda
+
+on:
+    push:
+      branches:
+          - main
+
+jobs:
+  update_lambda:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 🗿 Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ID }}:role/shopify-changelog-role
+          aws-region: us-east-1
+
+      -  name: 🐣 Zipping lambda
+         run: |
+          sudo apt update
+          sudo apt install zip
+          cd functions
+          zip -r shopify-changelog.zip .
+
+      - name: 🕊 Update Lambda
+        run: |
+            aws lambda update-function-code \
+                --function-nam shopify-changelog-rss \
+                --zip-file fileb://shopify-changelog.zip

@@ -1,8 +1,8 @@
 {
-  "name": "shopify-changelog",
+  "name": "shopify-changelog-rss",
   "version": "1.0.0",
   "author": "Erik Marty <erik@themazegroup.com>",
-  "license": "NONE",
+  "license": "MIT",
   "dependencies": {
     "axios": "^1.7.7",
     "cheerio": "^1.0.0",

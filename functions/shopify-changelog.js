@@ -2,6 +2,7 @@ const axios = require("axios");
 const cheerio = require("cheerio");
 const RSS = require("rss");
 
+// Define the day and month names for formatting the date
 const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const monthNames = [
   "January",
@@ -19,6 +20,7 @@ const monthNames = [
 ];
 
 const formatPubDate = (date) => {
+  // Re-format the date to match the RFC 822 date-time format
   const dayName = dayNames[date.getUTCDay()];
   const day = String(date.getUTCDate()).padStart(2, "0");
   const monthName = monthNames[date.getUTCMonth()];
@@ -33,6 +35,7 @@ const formatPubDate = (date) => {
 let lastProcessedDate = new Date();
 
 const inferYear = (month, day) => {
+  // Infer the year of the entry based on the last processed date
   const currentYear = lastProcessedDate.getUTCFullYear();
   const entryMonth = monthNames.indexOf(month);
   const entryDate = new Date(Date.UTC(currentYear, entryMonth, day));
@@ -54,22 +57,26 @@ const scrapeAndGenerateRSS = async () => {
     const $ = cheerio.load(html);
     const feedItems = [];
 
+    // Scrape the changelog.shopify.com for posts
     $(".block.post-block.gutter-bottom--reset.changelog-post").each(
       (i, element) => {
+        // Extract the month and day from the date text
         const dateText = $(element)
           .find(".post-block__date .heading--5")
           .text()
           .trim();
-
         const [monthName, day] = dateText.split(" ");
         const inferredDate = inferYear(monthName, parseInt(day, 10));
         const pubDate = formatPubDate(inferredDate);
+
+        // Extract the heading, link, content, feature, and category from the post
         const heading = $(element).find(".block__heading a").text().trim();
         const link = $(element).find(".block__heading a").attr("href");
         const content = $(element)
           .find(".block__content.post__content p")
           .text()
           .trim();
+
         const feature = $(element).find(".status-tag").text().trim();
         const category = $(element).find(".text-minor").text().trim();
 
@@ -77,6 +84,7 @@ const scrapeAndGenerateRSS = async () => {
           ? link
           : `https://changelog.shopify.com${link}`;
 
+        // Add the post to the RSS feed items
         feedItems.push({
           title: heading,
           description: content,
@@ -87,8 +95,9 @@ const scrapeAndGenerateRSS = async () => {
       }
     );
 
+    // Generate an RSS feed from the scraped posts
     const feed = new RSS({
-      title: "Changelog",
+      title: "Shopify Changelog",
       description: "What’s New at Shopify?",
       feed_url: "https://changelog.shopify.com",
       site_url: "https://changelog.shopify.com",
@@ -99,6 +108,7 @@ const scrapeAndGenerateRSS = async () => {
       category: "Changelog",
     });
 
+    // Add each post as an item in the RSS feed
     feedItems.forEach((item) => {
       feed.item({
         title: item.title,
@@ -109,6 +119,7 @@ const scrapeAndGenerateRSS = async () => {
       });
     });
 
+    // Generate the XML for the RSS feed
     const rssXML = feed.xml({ indent: true });
     console.log(rssXML);
 
