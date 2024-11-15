@@ -2,23 +2,23 @@ const axios = require("axios");
 const cheerio = require("cheerio");
 const RSS = require("rss");
 
-const formatPubDate = (date) => {
-  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const monthNames = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
+const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const monthNames = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
+const formatPubDate = (date) => {
   const dayName = dayNames[date.getUTCDay()];
   const day = String(date.getUTCDate()).padStart(2, "0");
   const monthName = monthNames[date.getUTCMonth()];
@@ -28,6 +28,21 @@ const formatPubDate = (date) => {
   const seconds = String(date.getUTCSeconds()).padStart(2, "0");
 
   return `${dayName}, ${day} ${monthName} ${year} ${hours}:${minutes}:${seconds} +0000`;
+};
+
+let lastProcessedDate = new Date();
+
+const inferYear = (month, day) => {
+  const currentYear = lastProcessedDate.getUTCFullYear();
+  const entryMonth = monthNames.indexOf(month);
+  const entryDate = new Date(Date.UTC(currentYear, entryMonth, day));
+
+  if (entryDate > lastProcessedDate) {
+    entryDate.setUTCFullYear(currentYear - 1);
+  }
+
+  lastProcessedDate = entryDate;
+  return entryDate;
 };
 
 exports.handler = async (event) => {
@@ -45,6 +60,10 @@ exports.handler = async (event) => {
           .find(".post-block__date .heading--5")
           .text()
           .trim();
+
+        const [monthName, day] = dateText.split(" ");
+        const inferredDate = inferYear(monthName, parseInt(day, 10));
+        const pubDate = formatPubDate(inferredDate);
         const heading = $(element).find(".block__heading a").text().trim();
         const link = $(element).find(".block__heading a").attr("href");
         const content = $(element)
@@ -57,9 +76,6 @@ exports.handler = async (event) => {
         const absoluteLink = link.startsWith("http")
           ? link
           : `https://changelog.shopify.com${link}`;
-
-        const rawDate = new Date(`${dateText} ${new Date().getFullYear()}`);
-        const pubDate = formatPubDate(rawDate);
 
         feedItems.push({
           title: heading,
@@ -74,7 +90,7 @@ exports.handler = async (event) => {
     const feed = new RSS({
       title: "Changelog",
       description: "What’s New at Shopify?",
-      feed_url: "",
+      feed_url: "https://changelog.shopify.com",
       site_url: "https://changelog.shopify.com",
       language: "en-us",
       ttl: 40,
