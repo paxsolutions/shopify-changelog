@@ -1,6 +1,6 @@
 # What’s New at Shopify?
 
-The scripts in the repo convert https://changelog.shopify.com into an RSS feed hosted on AWS Lambda for use in Slack. The motivation behind this is that no such feed is provided by Shopify, only the Developer changelog.
+The script(s) in this repo convert https://changelog.shopify.com into an RSS feed hosted on AWS Lambda to use in Slack. The motivation behind this is that no such feed is provided by Shopify, only the Developer changelog.
 
 ### How to use
 
@@ -57,6 +57,12 @@ aws lambda update-function-code \
     --function-name shopify-changelog-rss \
     --zip-file fileb://<your-zip-file>.zip
 ```
+
+### CI/CD
+
+This repo also includes a GitHub Workflow that will update the lambda using [ GitHub's OIDC provider](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services) by configuring the [role, trust, and permissions](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services) in AWS IAM
+
+---
 
 ### Author
 
