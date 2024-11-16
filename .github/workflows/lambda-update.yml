@@ -15,6 +15,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'latest'
 
       - name: 🗿 Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -26,11 +29,12 @@ jobs:
          run: |
           sudo apt update
           sudo apt install zip
-          cd functions
+          cd functions && npm install
           zip -r shopify-changelog.zip .
 
       - name: 🕊 Update Lambda
         run: |
+            cd functions
             aws lambda update-function-code \
                 --function-nam shopify-changelog-rss \
                 --zip-file fileb://shopify-changelog.zip
