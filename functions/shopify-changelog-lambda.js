@@ -1,6 +1,15 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
 const RSS = require("rss");
+const selectors = require("./selectors");
+
+const wrapper_selector = selectors.wrapper;
+const date_selector = selectors.date;
+const header_and_link_selector = selectors.header_and_link;
+const content_selector = selectors.content;
+const status_label_selector = selectors.status_label;
+const category_label_selector = selectors.category_label;
+const feedUrl = "https://changelog.shopify.com";
 
 // Define the day and month names for formatting the date
 const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -50,7 +59,7 @@ const inferYear = (month, day) => {
 
 exports.handler = async (event) => {
   try {
-    const url = "https://changelog.shopify.com";
+    const url = feedUrl;
     const response = await axios.get(url);
     const html = response.data;
 
@@ -58,49 +67,41 @@ exports.handler = async (event) => {
     const feedItems = [];
 
     // Scrape the changelog.shopify.com for posts
-    $(".block.post-block.gutter-bottom--reset.changelog-post").each(
-      (i, element) => {
-        // Extract the month and day from the date text
-        const dateText = $(element)
-          .find(".post-block__date .heading--5")
-          .text()
-          .trim();
-        const [monthName, day] = dateText.split(" ");
-        const inferredDate = inferYear(monthName, parseInt(day, 10));
-        const pubDate = formatPubDate(inferredDate);
+    $(wrapper_selector).each((i, element) => {
+      // Extract the month and day from the date text
+      const dateText = $(element).find(date_selector).text().trim();
+      const [monthName, day] = dateText.split(" ");
+      const inferredDate = inferYear(monthName, parseInt(day, 10));
+      const pubDate = formatPubDate(inferredDate);
 
-        // Extract the heading, link, content, feature, and category from the post
-        const heading = $(element).find(".block__heading a").text().trim();
-        const link = $(element).find(".block__heading a").attr("href");
-        const content = $(element)
-          .find(".block__content.post__content p")
-          .text()
-          .trim();
+      // Extract the heading, link, content, feature, and category from the post
+      const heading = $(element).find(header_and_link_selector).text().trim();
+      const link = $(element).find(header_and_link_selector).attr("href");
+      const content = $(element).find(content_selector).text().trim();
 
-        const feature = $(element).find(".status-tag").text().trim();
-        const category = $(element).find(".text-minor").text().trim();
+      const feature = $(element).find(status_label_selector).text().trim();
+      const category = $(element).find(category_label_selector).text().trim();
 
-        const absoluteLink = link.startsWith("http")
-          ? link
-          : `https://changelog.shopify.com${link}`;
+      const absoluteLink = link.startsWith("http")
+        ? link
+        : `https://changelog.shopify.com${link}`;
 
-        // Add the post to the RSS feed items
-        feedItems.push({
-          title: heading,
-          description: content,
-          link: absoluteLink,
-          pubDate: pubDate,
-          categories: [feature, category].filter(Boolean),
-        });
-      }
-    );
+      // Add the post to the RSS feed items
+      feedItems.push({
+        title: heading,
+        description: content,
+        link: absoluteLink,
+        pubDate: pubDate,
+        categories: [feature, category].filter(Boolean),
+      });
+    });
 
     // Generate an RSS feed from the scraped posts
     const feed = new RSS({
       title: "Shopify Changelog",
       description: "What’s New at Shopify?",
-      feed_url: "https://changelog.shopify.com",
-      site_url: "https://changelog.shopify.com",
+      feed_url: feedUrl,
+      site_url: feedUrl,
       language: "en-us",
       ttl: 40,
       pubDate: new Date().toUTCString(),

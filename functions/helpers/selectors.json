@@ -1,0 +1,8 @@
+{
+    "wrapper": ".block.post-block.gutter-bottom--reset.changelog-post",
+    "date": ".post-block__date .heading--5",
+    "header_and_link": ".block__heading a",
+    "content": ".block__content.post__content p",
+    "status_label": ".status-tag",
+    "category_label": ".text-minor"
+}
