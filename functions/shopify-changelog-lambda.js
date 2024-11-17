@@ -1,7 +1,7 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
 const RSS = require("rss");
-const selectors = require("./selectors.json");
+const selectors = require(".helpers/selectors.json");
 
 const wrapper_selector = selectors.wrapper;
 const date_selector = selectors.date;
