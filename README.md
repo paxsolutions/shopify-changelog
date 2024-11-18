@@ -42,8 +42,13 @@ Remember when we add the handler we have to use the convention: `file_name.funct
 
 ### Test your function
 
-![test-your-lambda](img/lambda-test.jpg)
+Within the `functions` directory run:
 
+```
+npm run test
+```
+
+You should see the RSS XML output in your terminal
 
 ### Updating the function
 

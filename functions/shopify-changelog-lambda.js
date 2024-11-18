@@ -3,12 +3,14 @@ const cheerio = require("cheerio");
 const RSS = require("rss");
 const selectors = require("./helpers/selectors.json");
 
+// Define the selectors for changelog.shopify.com
 const wrapper_selector = selectors.wrapper;
 const date_selector = selectors.date;
 const header_and_link_selector = selectors.header_and_link;
 const content_selector = selectors.content;
 const status_label_selector = selectors.status_label;
 const category_label_selector = selectors.category_label;
+
 const feedUrl = "https://changelog.shopify.com";
 
 // Define the day and month names for formatting the date
@@ -59,14 +61,13 @@ const inferYear = (month, day) => {
 
 exports.handler = async (event) => {
   try {
-    const url = feedUrl;
-    const response = await axios.get(url);
+    const response = await axios.get(feedUrl);
     const html = response.data;
 
     const $ = cheerio.load(html);
     const feedItems = [];
 
-    // Scrape the changelog.shopify.com for posts
+    // Scrape changelog.shopify.com for posts
     $(wrapper_selector).each((i, element) => {
       // Extract the month and day from the date text
       const dateText = $(element).find(date_selector).text().trim();
@@ -82,9 +83,7 @@ exports.handler = async (event) => {
       const feature = $(element).find(status_label_selector).text().trim();
       const category = $(element).find(category_label_selector).text().trim();
 
-      const absoluteLink = link.startsWith("http")
-        ? link
-        : `https://changelog.shopify.com${link}`;
+      const absoluteLink = link.startsWith("http") ? link : `${feedUrl}${link}`;
 
       // Add the post to the RSS feed items
       feedItems.push({
@@ -122,6 +121,9 @@ exports.handler = async (event) => {
 
     // Generate the XML for the RSS feed
     const rssXML = feed.xml({ indent: true });
+
+    // For testing
+    console.log(rssXML);
 
     return {
       statusCode: 200,
