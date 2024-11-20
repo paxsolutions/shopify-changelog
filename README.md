@@ -2,12 +2,13 @@
 
 The script(s) in this repo convert https://changelog.shopify.com into an RSS feed hosted on AWS Lambda to use in Slack. The motivation behind this is that no such feed is provided by Shopify, only the Developer changelog.
 
-### How to use
+### Local verification
 
-Using `node v20.x`
+Within the `functions` directory run:
 
-1. `npm install`
-1. `node shopify-changelog.js`
+```
+npm install && npm run test
+```
 
 ### Lambda
 
@@ -39,14 +40,6 @@ aws lambda create-function \
 ```
 
 Remember when we add the handler we have to use the convention: `file_name.function_name` i.e. `shopify-changelog-lambda.handler`
-
-### Test your function
-
-Within the `functions` directory run:
-
-```
-npm run test
-```
 
 You should see the RSS XML output in your terminal
 
