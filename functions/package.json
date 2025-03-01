@@ -1,7 +1,7 @@
 {
   "name": "shopify-changelog-rss",
   "version": "1.0.0",
-  "author": "Erik Marty <erik@themazegroup.com>",
+  "author": "Erik Marty <erik@paxsolutions.biz",
   "license": "MIT",
   "scripts": {
     "test": "node -e \"console.log(require('./shopify-changelog-lambda').handler(require('./event.json')));\""

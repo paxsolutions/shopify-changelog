@@ -62,6 +62,3 @@ This repo also includes a GitHub Workflow that will update the lambda using [ Gi
 
 ---
 
-### Author
-
-Erik Marty <erik@themazegroup.com>
